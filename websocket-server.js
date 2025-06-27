@@ -1,20 +1,20 @@
-const WebSocket = require('ws');
-const PORT = process.env.PORT || 3000;
+const WebSocket = require('wss');
+const PORT = process.env.PORT || 8080;
 
 const wss = new WebSocket.Server({ port: PORT });
 console.log('Serveur WebSocket lancé sur le port', PORT);
 
-const users = new Map(); // username => ws
+const users = new Map(); // username => wss
 
-wss.on('connection', ws => {
+wss.on('connection', wss => {
   let username = null;
 
-  ws.on('message', msg => {
+  wss.on('message', msg => {
     const data = JSON.parse(msg);
 
     if (data.type === 'register') {
       username = data.username;
-      users.set(username, ws);
+      users.set(username, wss);
       updateUserList();
     }
 
@@ -24,7 +24,7 @@ wss.on('connection', ws => {
     }
   });
 
-  ws.on('close', () => {
+  wss.on('close', () => {
     if (username) {
       users.delete(username);
       updateUserList();
